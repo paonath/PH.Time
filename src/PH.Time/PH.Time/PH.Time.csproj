@@ -2,6 +2,40 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <ApplicationIcon>phNugetIcon.ico</ApplicationIcon>
+
+    <PackageId>PH.Time</PackageId>
+
+    <Description>Tiny Time representation</Description>
+
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+
+
+    <PackageTags>Time representation</PackageTags>
+
+    <PackageVersion>0.0.1-staging</PackageVersion>
+    <Authors>Paolo Innocenti</Authors>
+    <Copyright>Copyright PH 2020 (c) paonath@gmail.com. All rights reserved.</Copyright>
+    <RepositoryUrl>https://github.com/paonath/PH.Time</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/paonath/PH.Time</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/paonath/Icons/master/nuget_es_img.png</PackageIconUrl>
+
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="nuget_es_img.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PackageIcon>nuget_es_img.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
 
 </Project>
