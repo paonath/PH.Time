@@ -1,24 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace PH.Time
 {
-    public class TimeUtility
-    {
-
-        public static Time[] BuildTimeArray(Time start, Time end, TimePart buildByPart = TimePart.Hours,
-                                            bool includeExtremes = true)
-        {
-            var l = new List<Time>();
-            if (includeExtremes)
-            {
-                l.Add(start);
-                l.Add(end);
-            }
-            throw new NotImplementedException("to complete!");
-        }
-    }
-
     /// <summary>
     /// The Time Parts : <see cref="Hours"/> , <see cref="Minutes"/> and <see cref="Seconds"/>
     /// </summary>
@@ -40,7 +23,7 @@ namespace PH.Time
     /// <summary>
     /// The Time representation
     /// </summary>
-    public struct Time :  IComparable<Time> , IEquatable<Time>
+    public struct Time :  IComparable<Time> , IEquatable<Time> 
     {
 
         /// <summary>
@@ -86,11 +69,16 @@ namespace PH.Time
             Seconds = seconds;
         }
 
-        
 
-        public static Time MinValue => new Time(0, 0, 0);
-        public static Time MaxValue => new Time(23, 59, 59);
+        /// <summary>The minimum value for a Time: 00:00:00</summary>
+        public static readonly Time MinValue = new Time(0, 0);
 
+        /// <summary>The maximum value for a Time: 23:59:59</summary>
+        public static readonly Time MaxValue = new Time(23, 59, 59);
+
+        /// <summary>Get if Time is smaller, greather or equal than other.</summary>
+        /// <param name="other">The other Time.</param>
+        /// <returns><c>-1</c> if smaller, <c>0</c> if equals or <c>1</c> if grather</returns>
         public int CompareTo(Time other)
         {
             var hoursComparison = Hours.CompareTo(other.Hours);
@@ -108,17 +96,24 @@ namespace PH.Time
             return Seconds.CompareTo(other.Seconds);
         }
 
-        /// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance. The value is numeber of milliseconds from 00:00:00 to <see cref="Time"/></summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode =  Hours * 60 * 60 * 1000;
-                hashCode += Minutes * 60 * 1000;
-                hashCode += Seconds * 1000;
-                return hashCode;
+                return GetMilliseconds();
             }
+        }
+
+        /// <summary>Gets the milliseconds from 00:00:00 to <see cref="Time"/>.</summary>
+        /// <returns>milliseconds from 00:00:00 to time</returns>
+        public int GetMilliseconds()
+        {
+            var millis =  Hours * 60 * 60 * 1000;
+            millis += Minutes * 60 * 1000;
+            millis += Seconds * 1000;
+            return millis;
         }
 
         /// <summary>Indicates whether this instance and a specified object are equal.</summary>
@@ -186,10 +181,10 @@ namespace PH.Time
         /// <returns>string value.</returns>
         public override string ToString()
         {
-            return ToString("t");
+            return ToString("T");
         }
 
-       
+        
 
 
         public string ToString(string format)
@@ -217,7 +212,7 @@ namespace PH.Time
         /// <param name="timeAsString">string representation of Time</param>
         /// <param name="time">Time</param>
         /// <returns><c>true</c> if parsing is success</returns>
-        public bool TryParse(string timeAsString, out Time time)
+        public static bool TryParse(string timeAsString, out Time time)
         {
             time = MinValue;
             try
@@ -236,5 +231,9 @@ namespace PH.Time
                 return false;
             }
         }
+
+
     }
+
+
 }
