@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+	<Authors>Paolo Innocenti</Authors>
+	<Copyright>Copyright 2020 (c) Paolo Innocenti - paonath@gmail.com </Copyright>    
+	<AssemblyVersion>0.0.1</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <SourceRevisionId>build-$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</SourceRevisionId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <SourceRevisionId>rel-$([System.DateTime]::UtcNow.ToString("yyyyMMdd"))</SourceRevisionId>
+  </PropertyGroup>
+
+</Project>
+
