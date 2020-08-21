@@ -1,45 +1,53 @@
 ﻿using System;
+using System.Globalization;
+using JetBrains.Annotations;
 
 namespace PH.Time
 {
     /// <summary>
-    /// The Time Parts : <see cref="Hours"/> , <see cref="Minutes"/> and <see cref="Seconds"/>
-    /// </summary>
-    public enum TimePart
-    {
-        /// <summary>The hours part of <see cref="Time"/></summary>
-        /// <seealso cref="Time.Hours"/>
-        Hours = 0,
-
-        /// <summary>The minutes part of <see cref="Time"/></summary>
-        /// <seealso cref="Time.Minutes"/>
-        Minutes = 1,
-
-        // <summary>The seconds part of <see cref="Time"/></summary>
-        /// <seealso cref="Time.Seconds"/>
-        Seconds = 2
-    }
-
-    /// <summary>
     /// The Time representation
     /// </summary>
-    public struct Time :  IComparable<Time> , IEquatable<Time> 
+    public struct Time :  IComparable<Time> , IEquatable<Time> , IFormattable
     {
+        private int _hours;
 
         /// <summary>
         /// The Hours part of a DateTime
         /// </summary>
-        public int Hours { get; set; }
+        public int Hours
+        {
+            get => _hours;
+            set => SetHours(value);
+        }
+
+        private int _minutes;
 
         /// <summary>
         /// The Minutes part of a DateTime
         /// </summary>
-        public int Minutes { get; set; }
+        public int Minutes
+        {
+            get => _minutes;
+            set => SetMinutes(value);
+        }
+
+        private int _seconds;
 
         /// <summary>
         /// The Seconds part of a DateTime
         /// </summary>
-        public int Seconds { get; set; }
+        public int Seconds
+        {
+            get => _seconds;
+            set => SetSeconds(value);
+        }
+
+        private Time(object o)
+        {
+            _hours   = 0;
+            _minutes = 0;
+            _seconds = 0;
+        }
 
         /// <summary>
         /// Init new Time
@@ -47,28 +55,55 @@ namespace PH.Time
         /// <param name="hours">hours</param>
         /// <param name="minutes">minutes</param>
         /// <param name="seconds">seconds</param>
+        /// <exception cref="ArgumentOutOfRangeException">hours - A valid Hour is between 0 and 23</exception>
+        /// <exception cref="ArgumentOutOfRangeException">minutes - A valid Minute is between 0 and 59</exception>
+        /// <exception cref="ArgumentOutOfRangeException">seconds - A valid Second is between 0 and 59</exception>
         public Time(int hours, int minutes, int seconds = 0)
+            :this(null)
+        {
+            SetHours(hours);
+            SetMinutes(minutes);
+            SetSeconds(seconds);
+        }
+
+        /// <summary>Sets the hours.</summary>
+        /// <param name="hours">The hours.</param>
+        /// <exception cref="ArgumentOutOfRangeException">hours - A valid Hour is between 0 and 23</exception>
+        private void SetHours(int hours)
         {
             if (hours < 0 || hours > 23)
             {
                 throw new ArgumentOutOfRangeException(nameof(hours), hours, $"A valid Hour is between 0 and 23");
             }
 
-            if (minutes < 0 || minutes > 59)
-            {
-                throw new ArgumentOutOfRangeException(nameof(minutes), minutes, $"A valid Minute is between 0 and 59");
-            }
-
-            if (seconds < 0 || seconds > 59)
-            {
-                throw new ArgumentOutOfRangeException(nameof(seconds), seconds, $"A valid Second is between 0 and 59");
-            }
-
-            Hours   = hours;
-            Minutes = minutes;
-            Seconds = seconds;
+            _hours = hours;
         }
 
+        /// <summary>Sets the minutes.</summary>
+        /// <param name="minutes">The minutes.</param>
+        /// <exception cref="ArgumentOutOfRangeException">minutes - A valid Minute is between 0 and 59</exception>
+        private void SetMinutes(int minutes)
+        {
+            if (minutes < 0 || minutes > 59)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minutes), minutes, "A valid Minute is between 0 and 59");
+            }
+
+            _minutes = minutes;
+        }
+
+        /// <summary>Sets the seconds.</summary>
+        /// <param name="seconds">The seconds.</param>
+        /// <exception cref="ArgumentOutOfRangeException">seconds - A valid Second is between 0 and 59</exception>
+        private void SetSeconds(int seconds = 0)
+        {
+            if (seconds < 0 || seconds > 59)
+            {
+                throw new ArgumentOutOfRangeException(nameof(seconds), seconds, "A valid Second is between 0 and 59");
+            }
+
+            _seconds = seconds;
+        }
 
         /// <summary>The minimum value for a Time: 00:00:00</summary>
         public static readonly Time MinValue = new Time(0, 0);
@@ -100,10 +135,8 @@ namespace PH.Time
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return GetMilliseconds();
-            }
+            return GetMilliseconds();
+
         }
 
         /// <summary>Gets the milliseconds from 00:00:00 to <see cref="Time"/>.</summary>
@@ -174,40 +207,75 @@ namespace PH.Time
             return left.CompareTo(right) >= 0;
         }
 
-        
 
+        [NotNull]
+        public string GetLongTime() =>
+            $"{Hours.ToString().PadLeft(2, '0')}:{Minutes.ToString().PadLeft(2, '0')}:{Seconds.ToString().PadLeft(2, '0')}";
+
+        [NotNull]
+        public string GetShortTime() => $"{Hours.ToString().PadLeft(2, '0')}:{Minutes.ToString().PadLeft(2, '0')}";
 
         /// <summary>Returns the string value representation of this instance as '16:32:32'. </summary>
         /// <returns>string value.</returns>
+        [NotNull]
         public override string ToString()
         {
-            return ToString("T");
+            return ToString("T", CultureInfo.CurrentCulture);
         }
 
-        
-
-
-        public string ToString(string format)
+        /// <summary>Formats the value of the current instance using the specified format.</summary>
+        /// <param name="format">The format to use.   -or-   A null reference (Nothing in Visual Basic) to use the default format defined for the type of the <see cref="T:System.IFormattable"></see> implementation.</param>
+        /// <param name="formatProvider">The provider to use to format the value.   -or-   A null reference (Nothing in Visual Basic) to obtain the numeric format information from the current locale setting of the operating system.</param>
+        /// <returns>The value of the current instance in the specified format.</returns>
+        public string ToString(string format, IFormatProvider formatProvider)
         {
-            var h = $"{Hours}".PadLeft(2, '0');
-            var m = $"{Minutes}".PadLeft(2, '0');
-            var s = $"{Seconds}".PadLeft(2, '0');
+            if (string.IsNullOrEmpty(format))
+            {
+                format = "G";
+            }
+
+            //if (formatProvider == null)
+            //{
+            //    formatProvider = CultureInfo.CurrentCulture;
+            //}
             
-            //    * t :16:32
-            //    * T :16:32:32
             switch (format)
             {
+                    
+
+
                 case "t":
-                    return $"{h}:{m}";
+                    case "shortTime":
+                    return GetShortTime();
                 case "T":
-                    default:
-                    return $"{h}:{m}:{s}";
+                case "G":
+                case "longTime":
+                default:
+                    return GetLongTime();
+
             }
+
+           
+        }
+
+
+        
+        /// <summary>Parses the specified time as string.</summary>
+        /// <param name="timeAsString">The time as string if format hh:mm:ss or hh:mm.</param>
+        /// <returns>Time value</returns>
+        public static Time Parse(string timeAsString)
+        {
+            var spl = timeAsString.Split(new[] {':'}, StringSplitOptions.RemoveEmptyEntries);
+            if (spl.Length == 3)
+            {
+                return new Time(int.Parse(spl[0]), int.Parse(spl[1]), int.Parse(spl[3]));
+                
+            }
+            return new Time(int.Parse(spl[0]), int.Parse(spl[1]));
         }
         
-        
         /// <summary>
-        /// Parse a string as '13:10:27' to a <see cref="Time"/>
+        /// Parse a string as hh:mm:ss or hh:mm to a <see cref="Time"/>
         /// </summary>
         /// <param name="timeAsString">string representation of Time</param>
         /// <param name="time">Time</param>
@@ -217,13 +285,7 @@ namespace PH.Time
             time = MinValue;
             try
             {
-                var spl = timeAsString.Split(new[] {':'}, StringSplitOptions.RemoveEmptyEntries);
-                if (spl.Length == 3)
-                {
-                    time = new Time(int.Parse(spl[0]), int.Parse(spl[1]), int.Parse(spl[3]));
-                    return true;
-                }
-                time = new Time(int.Parse(spl[0]), int.Parse(spl[1]), 0);
+                time = Parse(timeAsString);
                 return true;
             }
             catch
@@ -236,4 +298,5 @@ namespace PH.Time
     }
 
 
+    
 }
