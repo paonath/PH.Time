@@ -7,7 +7,6 @@ using Xunit.Abstractions;
 namespace PH.Time.XUnitTest
 {
 
-    
 
     public class UnitTest1
     {
