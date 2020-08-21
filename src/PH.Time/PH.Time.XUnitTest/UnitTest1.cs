@@ -2,11 +2,21 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace PH.Time.XUnitTest
 {
+
+
     public class UnitTest1
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public UnitTest1(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         public void Test1()
         {
@@ -134,6 +144,25 @@ namespace PH.Time.XUnitTest
                                                               Assert.Equal(49, arr0.Length);
             Assert.Single(arr1);
             Assert.Equal(new Time(0, 30, 0), arr1[0]);
+        }
+
+        [Fact]
+        public void DocExample()
+        {
+
+            var time                   = Time.MinValue;
+            var nine                   = new Time(9,0);
+            var midNight               = new Time(0, 0, 0);
+
+            var nineSmallerThanMidnith = nine < time;
+            var zeroIsMidnight         = time == midNight;
+
+
+            _testOutputHelper.WriteLine($"{nineSmallerThanMidnith}");
+            _testOutputHelper.WriteLine($"{zeroIsMidnight}");
+
+
+
         }
     }
 }
