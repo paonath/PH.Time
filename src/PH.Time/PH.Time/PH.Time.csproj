@@ -6,14 +6,19 @@
 
     <PackageId>PH.Time</PackageId>
 
-    <Description>Tiny Time representation</Description>
+    <Description>
+      Tiny Time expression:
+
+      this is a simple c# struct for exress  time value to avoid use of TimeStamp.
+
+    </Description>
 
     <PackageReleaseNotes>
       First release
     </PackageReleaseNotes>
 
 
-    <PackageTags>Time representation</PackageTags>
+    <PackageTags>Time</PackageTags>
 
     <PackageVersion>0.0.1</PackageVersion>
     <Authors>Paolo Innocenti</Authors>
