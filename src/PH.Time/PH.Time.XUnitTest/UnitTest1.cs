@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,14 +24,90 @@ namespace PH.Time.XUnitTest
             var t = new Time(9, 0);
             var e = Time.MaxValue;
 
-            var format = $"{t:G}";
+            var min = Time.MinValue;
+            var dt  = DateTime.MinValue.GetTime();
+            var of  = DateTimeOffset.MinValue.GetTime();
+
+           
+
+            var format    = $"{t:G}";
+            var format1    = $"{t:t}";
+            var shortTime = t.GetShortTime();
+
 
             var ser = JsonConvert.SerializeObject(t);
 
 
             var x = t.ToString();
 
+            var n = Time.MinValue;
+            n.Hours   = 8;
+            n.Minutes = 9;
+            n.Seconds = 10;
+
+            bool minOrEqual  = n <= Time.MaxValue;
+            bool grathOrEqul = n >= new Time(8, 9, 10);
+            bool greath      = n >= Time.MinValue;
+
+
+            Exception nExc0 = null;
+            try
+            {
+                Time tt = Time.MaxValue;
+                tt.Hours = 41;
+            }
+            catch (Exception exception)
+            {
+                nExc0 = exception;
+            }
+
+            Exception nExc1 = null;
+            try
+            {
+                Time tt = Time.MaxValue;
+                tt.Minutes = 64;
+            }
+            catch (Exception exception)
+            {
+                nExc1 = exception;
+            }
+
+            Exception nExc2 = null;
+            try
+            {
+                Time tt = Time.MaxValue;
+                tt.Seconds = 64;
+            }
+            catch (Exception exception)
+            {
+                nExc2 = exception;
+            }
+
             Assert.True(!string.IsNullOrEmpty(x));
+            Assert.Equal(dt, min);
+            Assert.Equal(of, min);
+            Assert.Equal(0, min.Hours);
+            Assert.Equal(0, min.Minutes);
+            Assert.Equal(0, min.Seconds);
+
+            Assert.Equal(0, dt.Hours);
+            Assert.Equal(0, dt.Minutes);
+            Assert.Equal(0, dt.Seconds);
+
+            Assert.Equal(0, of.Hours);
+            Assert.Equal(0, of.Minutes);
+            Assert.Equal(0, of.Seconds);
+            Assert.Equal("09:00:00", format);
+            Assert.Equal("09:00", shortTime);
+            Assert.Equal("09:00", format1);
+
+            Assert.NotNull(nExc0);
+            Assert.NotNull(nExc1);
+            Assert.NotNull(nExc2);
+
+            Assert.True(minOrEqual);
+            Assert.True(grathOrEqul);
+            Assert.True(greath);
         }
 
         [Fact]
@@ -63,6 +140,7 @@ namespace PH.Time.XUnitTest
         [Fact]
         public void TestNextValues()
         {
+
             var t0 = Time.MinValue;
             var r0 = t0.NextSecond(out var onNextDay0);
 
@@ -71,6 +149,27 @@ namespace PH.Time.XUnitTest
 
             var t2 = Time.MaxValue;
             var r2 = t2.NextSecond(out var onNextDay2);
+
+            var  byString0 = Time.Parse("09:00");
+            var  byString1 = Time.Parse("10:10:10");
+            bool t         = Time.TryParse("12:13:14", out Time trueTime);
+            bool f         = Time.TryParse("44:13:14", out Time falseTime);
+
+            object timeObj = new Time(9,0);
+
+            bool eq0 = byString0.Equals(new Time(9, 0));
+            bool eq1 = byString0.Equals(timeObj);
+            bool nq  = byString0.Equals(new Time(10, 0));
+
+
+            var p0 = Time.MinValue.Next(TimePart.Hours, out bool p0bool);
+            var p1 = Time.MinValue.Next(TimePart.Minutes, out bool p1bool);
+            var p2 = Time.MinValue.Next(TimePart.Seconds, out bool p2bool);
+
+
+            Assert.Equal(Time.MinValue, t0);
+            Assert.Equal(new Time(9, 59, 59), t1);
+            Assert.Equal(Time.MaxValue, t2);
 
 
             Assert.False(onNextDay0);
@@ -86,6 +185,57 @@ namespace PH.Time.XUnitTest
             Assert.Equal(0, r2.Hours);
             Assert.Equal(0, r2.Minutes);
             Assert.Equal(0, r2.Seconds);
+
+            Assert.Equal(new Time(9,0),byString0);
+            Assert.Equal(new Time(10,10,10),byString1);
+
+            Assert.True(t);
+            Assert.Equal(new Time(12,13,14) , trueTime);
+            Assert.False(f);
+            Assert.Equal(Time.MinValue, falseTime);
+
+            Assert.True(eq0);
+            Assert.True(eq1);
+            Assert.False(nq);
+
+            Assert.False(p0bool);
+            Assert.False(p1bool);
+            Assert.False(p2bool);
+
+            Assert.Equal(new Time(1,0,0), p0);
+            Assert.Equal(new Time(0,1,0), p1);
+            Assert.Equal(new Time(0,0,1), p2);
+
+
+        }
+
+        [Fact]
+        public void TestPreviousValues()
+        {
+            var t0 = Time.MinValue;
+            var r0 = t0.Previous(TimePart.Seconds, out bool prevDay0);
+
+            var t1 = new Time(9,0,0);
+            var r1 = t1.Previous(TimePart.Hours, out bool prevDay1);
+
+            var t2 = new Time(9,0,0);
+            var r2 = t2.Previous(TimePart.Minutes, out bool prevDay2);
+
+
+            Assert.Equal(Time.MinValue, t0);
+            Assert.Equal(new Time(9,0,0), t1);
+
+
+            Assert.Equal(new Time(23,59,59), r0);
+            Assert.True(prevDay0);
+            
+            Assert.Equal(new Time(8,0,0), r1);
+            Assert.False(prevDay1);
+
+            Assert.Equal(new Time(8,59,0), r2);
+            Assert.False(prevDay2);
+
+
         }
 
         [Fact]
@@ -138,12 +288,20 @@ namespace PH.Time.XUnitTest
             var arr1 = TimeFactory.BuildTimeArrayBySteps(Time.MinValue, new Time(0, 45), 30, TimePart.Minutes,
                                                          includeExtremes: false);
 
-            
 
+            var arr2 = TimeFactory.BuildTimeArrayBySteps(Time.MinValue, Time.MaxValue, 1, TimePart.Hours);
+            var fkk2 = TimeFactory.BuildTimeArray(Time.MinValue, Time.MaxValue);
 
-                                                              Assert.Equal(49, arr0.Length);
+            var arr3 = TimeFactory.BuildTimeArrayBySteps(Time.MinValue, new Time(0,0,10), 1, TimePart.Seconds);
+
+            Assert.Equal(49, arr0.Length);
             Assert.Single(arr1);
             Assert.Equal(new Time(0, 30, 0), arr1[0]);
+            Assert.Equal(24,arr2.Length);
+            Assert.Equal(24,fkk2.Length);
+            Assert.Equal(arr2,fkk2);
+            Assert.Equal(11, arr3.Length);
+
         }
 
         [Fact]
