@@ -268,7 +268,7 @@ namespace PH.Time
             var spl = timeAsString.Split(new[] {':'}, StringSplitOptions.RemoveEmptyEntries);
             if (spl.Length == 3)
             {
-                return new Time(int.Parse(spl[0]), int.Parse(spl[1]), int.Parse(spl[3]));
+                return new Time(int.Parse(spl[0]), int.Parse(spl[1]), int.Parse(spl[2]));
                 
             }
             return new Time(int.Parse(spl[0]), int.Parse(spl[1]));
@@ -279,7 +279,8 @@ namespace PH.Time
         /// </summary>
         /// <param name="timeAsString">string representation of Time</param>
         /// <param name="time">Time</param>
-        /// <returns><c>true</c> if parsing is success</returns>
+        /// <returns><c>true</c> if parsing is success, otherwise <c>false</c>
+        /// (if false <param name="time">time</param> is set to <see cref="MinValue"/>) </returns>
         public static bool TryParse(string timeAsString, out Time time)
         {
             time = MinValue;
