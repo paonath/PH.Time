@@ -322,5 +322,24 @@ namespace PH.Time.XUnitTest
 
 
         }
+
+        [Fact]
+        public void DocExample()
+        {
+
+            var time                   = Time.MinValue;
+            var nine                   = new Time(9,0);
+            var midNight               = new Time(0, 0, 0);
+
+            var nineSmallerThanMidnith = nine < time;
+            var zeroIsMidnight         = time == midNight;
+
+
+            _testOutputHelper.WriteLine($"{nineSmallerThanMidnith}");
+            _testOutputHelper.WriteLine($"{zeroIsMidnight}");
+
+
+
+        }
     }
 }
